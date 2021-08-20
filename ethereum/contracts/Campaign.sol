@@ -58,14 +58,14 @@ contract Campaign {
         contributorsCount++;
     }
 
-    function createRequest(string description, uint value, address recipient) public isManager { // Only a manager should be able to create a request
+    function createRequest(string description, uint value, address recipient) public isManager {// Only a manager should be able to create a request
         // Create a new request and add it into the requests array
-        Request memory request = Request({ // We don't use new since is not a contract
-        description: description,
-        recipient: recipient,
-        value: value, // TODO use the value of the contract itself
-        complete: false,
-        approvalCount: 0 // We don't have to initialize a reference type, like for example a mapping
+        Request memory request = Request({// We don't use new since is not a contract
+        description : description,
+        recipient : recipient,
+        value : value, // TODO use the value of the contract itself
+        complete : false,
+        approvalCount : 0 // We don't have to initialize a reference type, like for example a mapping
         });
 
         requests.push(request);
@@ -96,5 +96,21 @@ contract Campaign {
 
         request.recipient.transfer(request.value);
         request.complete = true;
+    }
+
+    // This function will be called specially on the frontend side
+    function getSummary() public view returns (uint, uint, uint, uint, address) {
+        return (
+            minContribution,
+            address(this).balance,
+            requests.length,
+            contributorsCount,
+            manager
+        );
+    }
+
+    // This function will be called specially on the frontend side
+    function getRequestCount() public view returns (uint) {
+        return requests.length;
     }
 }
