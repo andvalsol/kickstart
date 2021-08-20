@@ -1,15 +1,18 @@
 import React, {Component} from 'react';
 import Layout from "../../components/Layout";
 import CampaignContract from "../../ethereum/Campaign";
-import {Card} from 'semantic-ui-react';
+import {Card, Grid, Button} from 'semantic-ui-react';
 import web3 from "../../ethereum/web3";
 import ContributeForm from "../../components/ContributeForm";
+import {Link} from '../../routes'
 
 class CampaignShow extends Component {
     // the props passed to this function is different from the props from the component
     static async getInitialProps(props) {
         // this will return the address from the url
-        const campaign = CampaignContract(props.query.address);
+        const address = props.query.address
+
+        const campaign = CampaignContract(address);
 
         const summary = await campaign.methods.getSummary().call();
 
@@ -19,6 +22,7 @@ class CampaignShow extends Component {
             requestCount: summary[2],
             contributorsCount: summary[3],
             manager: summary[4],
+            address: address // We need to add this so that we can get a hold of this props and make it available to the entire component
         }
     }
 
@@ -63,8 +67,26 @@ class CampaignShow extends Component {
         return (
             <Layout>
                 <h3>Campaign</h3>
-                {this.renderCards()}
-                <ContributeForm/>
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column width={10}>
+                            {this.renderCards()}
+
+                        </Grid.Column>
+                        <Grid.Column width={6}>
+                            <ContributeForm address={this.props.address}/>
+                        </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row>
+                        <Grid.Column>
+                            <Link route={`/campaigns/${this.props.address}/requests`}>
+                                <a>
+                                    <Button primary>View requests</Button>
+                                </a>
+                            </Link>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
             </Layout>
         )
     }
